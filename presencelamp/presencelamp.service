@@ -1,0 +1,11 @@
+[Unit]
+Description=Meeting room alarm GPIO LED
+After=network-online.target
+
+[Service]
+ExecStart=/home/root/presencelamp -url http://10.25.244.23:8080/MeetingRoomServlet/meetingroom -room room001@example.com
+Restart=always
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target
