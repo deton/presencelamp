@@ -13,12 +13,11 @@ import microsoft.exchange.webservices.data.*;
 @WebServlet(name="MeetingRoomServlet",urlPatterns={"/meetingroom"})
 public class MeetingRoomServlet extends HttpServlet {
     final static long WAITMS_DEFAULT = 5 * 60 * 1000; // 5[min]
-    final static long DIFF_FAR = 20 * 60 * 1000;
-    final static long DIFF_STAGE0 = 15 * 60 * 1000;
-    final static long DIFF_STAGE1 = 10 * 60 * 1000;
-    final static long DIFF_STAGE2 = 5 * 60 * 1000;
-    final static long DIFF_REMINDER0 = -5 * 60 * 1000;
-    final static long DIFF_REMINDER1 = -10 * 60 * 1000;
+    final static long DIFF_FAR =      20 * 60 * 1000;
+    final static long DIFF_STAGE0 =   15 * 60 * 1000;
+    final static long DIFF_STAGE1 =   10 * 60 * 1000;
+    final static long DIFF_STAGE2 =    5 * 60 * 1000;
+    final static long DIFF_REMINDER = -5 * 60 * 1000;
 
     enum State {
         NONE, COLORTIMER0, COLORTIMER1, COLORTIMER2, COLORTIMER_REMINDER,
@@ -105,11 +104,9 @@ public class MeetingRoomServlet extends HttpServlet {
             return new ResponseParams(State.COLORTIMER1, diff, diff - DIFF_STAGE2);
         } else if (diff > 0) {
             return new ResponseParams(State.COLORTIMER2, diff, diff);
-        } else if (diff > DIFF_REMINDER0) {
-            return new ResponseParams(State.COLORTIMER_REMINDER, diff, diff - DIFF_REMINDER0);
-        } else if (diff > DIFF_REMINDER1) {
-            return new ResponseParams(State.COLORTIMER_REMINDER, diff, diff - DIFF_REMINDER1);
-        } else { // diff <= -10
+        } else if (diff > DIFF_REMINDER) {
+            return new ResponseParams(State.COLORTIMER_REMINDER, diff, diff - DIFF_REMINDER);
+        } else { // diff <= -5
             return new ResponseParams(State.NONE, diff, WAITMS_DEFAULT);
         }
     }
