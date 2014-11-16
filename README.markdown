@@ -68,7 +68,7 @@ vi /etc/systemd/journald.conf # Storage=volatileに変更
 
 journald.confの変更は、disk full回避のためです。
 再起動のたびに/var/log/journal/以下が増えていくようなので。
-[参考](http://nonnoise.github.io/Edison/NoSpace.html)
+[参考](http://trac.switch-science.com/wiki/IntelEdisonJournalDiskUsage)
 
 #### presencelampの配備
 別マシン上のGo言語コンパイラでlinux/386用にビルドして、
