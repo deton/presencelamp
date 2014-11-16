@@ -1,11 +1,14 @@
-# PresenceLamp (会議室内向けプレゼンス表示LED)
+# 会議室残り時間通知LED
 
-会議室内向けのプレゼンス情報をLEDの点滅で表示するものを、
-Intel Edisonを使って作りました。
+会議室を使える残り時間が15分以下になったことをLED点滅で通知する、
+会議室設置用デバイスです。
+Wi-Fi接続したIntel Edisonにより、会議室予約情報をExchangeサーバから取得し、
+LEDを点滅させます。
 
 以下のような状況を改善するのが目的です。
 
-+ 次の予約時刻が来たので、議論途中であわてて会議室を空けないといけなくなった
++ 会議室に次の予約が入っている時刻が近づいているのに気づかずに
+  議論に集中していたため、議論途中であわてて会議室を空けないといけなくなった
 + 開始時刻になったのに、前の会議が終わっていなくて会議を始められない
 
 会議室内に置いておくと、
@@ -24,7 +27,7 @@ Intel Edisonを使って作りました。
 
 ## 構成
 
-Exchangeサーバ --- MeetingRoomServlet --- presencelamp(Edison) --- LED
+LED --- presencelamp(Edison) --- MeetingRoomServlet --- Exchangeサーバ
 
 ### LED点滅制御(デバイス側。presencelamp)
 5分間隔で、サーバ上の会議室予約状況取得Servletにリクエストを送り、
@@ -65,7 +68,7 @@ vi /etc/systemd/journald.conf # Storage=volatileに変更
 
 journald.confの変更は、disk full回避のためです。
 再起動のたびに/var/log/journal/以下が増えていくようなので。
-[参考](https://communities.intel.com/message/260697#260697)
+[参考](http://nonnoise.github.io/Edison/NoSpace.html)
 
 #### presencelampの配備
 別マシン上のGo言語コンパイラでlinux/386用にビルドして、
@@ -142,7 +145,6 @@ Breakout boardの使用するピンに、丸ピンソケットをはんだづけ
         (オフィスの席と隣接した、壁で囲われていない会議スペースにおいて、
         近くの人が、会議の声がうるさいと感じた時にWebで入力)
       * 昼休み時間や終業時間が近づいていることを通知
-      * 音による通知。目覚まし時計と同様に。
  * 会議の空気表示
       * 話についていけなくなった/質問がある/いいね/へぇ/拍手などを、
         Webで入力するとLED点灯。
@@ -151,10 +153,14 @@ Breakout boardの使用するピンに、丸ピンソケットをはんだづけ
 * 会議室外向けプレゼンス表示
  * 会議室が使用中かどうか
 * 入出力部品の追加
- * LED消灯ボタン。目覚まし時計と同様に。
- * 予約延長ボタンや次週の同じ時間予約ボタン等。
+ * 音などによる通知。目覚まし時計や予鈴と同様。
+   (より気づきやすい通知をするには、
+   [XFD(eXtreme Feedback Device)](http://objectclub.jp/community/xfd/)を参考に?)
+ * 照明による通知(Philips hue等)
  * 時計表示LCDの追加。時計としても使えるように。
  * フルカラーLED化。様々なプレゼンス表示用
+ * LED消灯ボタン。目覚まし時計と同様に。
+ * 予約延長ボタンや次週の同じ時間予約ボタン等。
 * デバイスとしては、会議室用タブレットを置く形が一番便利な気も。
   予約時間の延長や、次回会議の予約等もタブレット上で操作する等。
   ただ、会議室用にタブレットやスマホを置くのは、
@@ -188,6 +194,8 @@ USB Wi-FiでのWPA2 Enterprise(EAP)への接続が安定せず断念。
 
 ![内部写真Raspberry Pi版](https://github.com/deton/presencelamp/raw/master/PresenceLampRasPiInside.jpg)
 
+golangソースはEdison版と同じ。GOARCH=armでビルド。
+
 ## その他細かい話
 + もともと、EWS Java APIをデバイス側で使う必要があるかと思って、
 EdisonやRaspberry Piを候補にしていましたが、
@@ -207,7 +215,7 @@ Arudino等を使ってもいいかもしれません。
   今回は明るさが欲しかったのでトランジスタを使用。
 
 + Linux GPIO sysfsを制御するgolang用ライブラリとして、
-github.com/kidoman/embdを試したが、CTRL-Cで終了した後など、
+github.com/kidoman/embdを試しましたが、CTRL-Cで終了した後など、
 /sys/class/gpio/gpio24等のファイルが残っていると初期化エラーになって面倒なのと、
 細かいファイルで構成されていて把握しにくかったので、
 github.com/aqua/raspberrypi/gpioに変更。
